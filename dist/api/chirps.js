@@ -1,12 +1,23 @@
 import { BadRequest } from "./middleware.js";
 import { createChirp, retrieveChirps, retrieveChirp } from "../db/queries/chirps.js";
+import { getBearerToken, validateJWT } from "./auth.js";
+import { config } from "./config.js";
 export async function handlerChirps(req, res, next) {
+    let userID;
+    try {
+        const bearerToken = getBearerToken(req);
+        userID = validateJWT(bearerToken, config.api.secret);
+    }
+    catch (error) {
+        next(error);
+        return;
+    }
     const chirpBody = await handlerValidation(req, res);
     if (typeof chirpBody !== "string") {
         return;
     }
     try {
-        const chirp = await createChirp({ "body": chirpBody, "userId": req.body["userId"] });
+        const chirp = await createChirp({ "body": chirpBody, "userId": userID });
         res.status(201).send(chirp);
     }
     catch (error) {

@@ -6,16 +6,14 @@ describe("Hashing Validity", () => {
   const password2 = "anotherPassword456!";
   const userId1 = "123";
   const userId2 = "456";
-  const exiresIn = 1000;
-  const expired = -1;
   let hash1: string;
   let hash2: string;
   let hashExpired: string;
 
   beforeAll(async () => {
-    hash1 = makeJWT(userId1, exiresIn, password1);
-    hash2 = makeJWT(userId2, exiresIn, password2);
-    hashExpired = makeJWT(userId1, expired, password1);
+    hash1 = makeJWT(userId1, password1);
+    hash2 = makeJWT(userId2, password2);
+    hashExpired = makeJWT(userId1, password1);
   });
 
   it("should return true for the correct password1", async () => {

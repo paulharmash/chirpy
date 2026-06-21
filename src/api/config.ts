@@ -8,6 +8,7 @@ const migrationConfig: MigrationConfig = {
 type APIConfig = {
   fileserverHits: number,
   platform: string,
+  secret: string,
 };
 
 type DBConfig = {
@@ -15,9 +16,9 @@ type DBConfig = {
   migrationConfig: MigrationConfig,
 };
 
-function envOrThrow(key: string | undefined) {
+function envOrThrow(key: string | undefined, keyName: string) {
   if (key === undefined) {
-    throw new Error("There must be a DB url");
+    throw new Error(`${keyName} must exist`);
   }
   return key;
 }
@@ -30,10 +31,11 @@ type Config = {
 export const config: Config = {
   api: {
     fileserverHits: 0,
-    platform: envOrThrow(process.env.PLATFORM),
+    platform: envOrThrow(process.env.PLATFORM, "PLATFORM"),
+    secret: envOrThrow(process.env.JWT_SECRET, "JWT_SECRET"),
   },
   db: {
-    url: envOrThrow(process.env.DB_URL),
+    url: envOrThrow(process.env.DB_URL, "DB_URL"),
     migrationConfig: migrationConfig,
   },
 };

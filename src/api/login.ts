@@ -1,6 +1,9 @@
 import { Request, Response, NextFunction } from "express";
 import { userLookup } from "../db/queries/users.js";
-import { checkPasswordHash } from "./auth.js";
+import { checkPasswordHash, getBearerToken } from "./auth.js";
+import { makeJWT, makeRefreshToken } from "./auth.js";
+import { config } from "./config.js";
+import { createRefreshToken, getUserFromRefreshToken, revokeRefreshToken} from "../db/queries/tokens.js";
 
 export async function handlerLogin(req: Request, res: Response, next: NextFunction) {
     const email = req.body["email"];
@@ -16,8 +19,33 @@ export async function handlerLogin(req: Request, res: Response, next: NextFuncti
     }
     if (await checkPasswordHash(password, user.hashedPassword)) {
         const {hashedPassword: _hashedPassword, ...userResponse} = user;
-        res.status(200).send(userResponse); 
+        const JWT = makeJWT(user.id, config.api.secret);
+        const refreshToken = makeRefreshToken();
+        await createRefreshToken({token: refreshToken, userId: userResponse.id, expiresAt: new Date(Date.now() + (60 * 24 * 3600 * 1000))})
+        res.status(200).send({...userResponse, token: JWT, refreshToken: refreshToken}); 
     } else {
         res.status(401).send("Incorrect email or password");
     }
+}
+
+export async function handlerRefreshToken(req: Request, res: Response, next: NextFunction) {
+    const refreshToken = getBearerToken(req);
+    try { 
+        const userId = await getUserFromRefreshToken(refreshToken);
+        const JWT = makeJWT(userId, config.api.secret);
+        res.status(200).send({token: JWT});
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function handlerRevokeRefreshToken(req: Request, res: Response, next: NextFunction) {
+    try {
+        const refreshToken = getBearerToken(req);
+        await revokeRefreshToken(refreshToken);
+        res.status(204).send();
+    } catch (error) {
+        next(error);
+    }
+    
 }

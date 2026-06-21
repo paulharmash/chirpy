@@ -19,7 +19,7 @@ export class BadRequest extends Error {
         super(message);
     }
 }
-class Unauthorized extends Error {
+export class Unauthorized extends Error {
     constructor(message) {
         super(message);
     }

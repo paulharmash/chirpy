@@ -24,7 +24,7 @@ export class BadRequest extends Error {
   }
 }
 
-class Unauthorized extends Error {
+export class Unauthorized extends Error {
   constructor(message: string) {
     super(message);
   }
