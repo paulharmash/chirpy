@@ -1,5 +1,5 @@
 import { BadRequest } from "./middleware.js";
-import { createChirp, retrieveChirps, retrieveChirp } from "../db/queries/chirps.js";
+import { createChirp, retrieveChirps, retrieveChirp, deleteChirp } from "../db/queries/chirps.js";
 import { getBearerToken, validateJWT } from "./auth.js";
 import { config } from "./config.js";
 export async function handlerChirps(req, res, next) {
@@ -61,6 +61,34 @@ export async function handlerChirpRetrieval(req, res, next) {
             return;
         }
         res.status(200).send(chirp);
+    }
+    catch (error) {
+        next(error);
+    }
+}
+export async function handlerChirpDeletion(req, res, next) {
+    let userID;
+    try {
+        const bearerToken = getBearerToken(req);
+        userID = validateJWT(bearerToken, config.api.secret);
+    }
+    catch (error) {
+        next(error);
+        return;
+    }
+    const chirpId = String(req.params.chirpId);
+    try {
+        const chirp = await retrieveChirp(chirpId);
+        if (chirp === undefined) {
+            res.status(404).send();
+            return;
+        }
+        else if (userID !== chirp.userId) {
+            res.status(403).send();
+            return;
+        }
+        await deleteChirp(chirpId);
+        res.status(204).send();
     }
     catch (error) {
         next(error);
