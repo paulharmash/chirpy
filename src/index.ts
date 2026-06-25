@@ -10,6 +10,7 @@ import { drizzle } from "drizzle-orm/postgres-js";
 import { config } from "./api/config.js";
 import { handlerChirps, handlerChirpsRetrieval, handlerChirpRetrieval, handlerChirpDeletion } from "./api/chirps.js";
 import { handlerLogin, handlerRefreshToken, handlerRevokeRefreshToken } from "./api/login.js";
+import { handlerUpdateUserToChirpyRed } from "./api/polka.js";
 
 const migrationClient = postgres(config.db.url, {max: 1});
 await migrate(drizzle(migrationClient), config.db.migrationConfig);
@@ -30,6 +31,7 @@ app.post("/api/users", handlerUserCreation);
 app.post("/api/login", handlerLogin);
 app.post("/api/refresh", handlerRefreshToken);
 app.post("/api/revoke", handlerRevokeRefreshToken);
+app.post("/api/polka/webhooks", handlerUpdateUserToChirpyRed);
 app.put("/api/users", handlerCredentialsUpdate);
 app.delete("/api/chirps/:chirpId", handlerChirpDeletion);
 

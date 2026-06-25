@@ -9,6 +9,7 @@ type APIConfig = {
   fileserverHits: number,
   platform: string,
   secret: string,
+  polkaKey: string,
 };
 
 type DBConfig = {
@@ -33,6 +34,7 @@ export const config: Config = {
     fileserverHits: 0,
     platform: envOrThrow(process.env.PLATFORM, "PLATFORM"),
     secret: envOrThrow(process.env.JWT_SECRET, "JWT_SECRET"),
+    polkaKey: envOrThrow(process.env.POLKA_KEY, "POLKA_KEY"),
   },
   db: {
     url: envOrThrow(process.env.DB_URL, "DB_URL"),

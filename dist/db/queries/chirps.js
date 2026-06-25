@@ -9,9 +9,15 @@ export async function createChirp(chirp) {
         .returning();
     return result;
 }
-export async function retrieveChirps() {
-    const result = await db.select().from(chirps).orderBy(asc(chirps.createdAt));
-    return result;
+export async function retrieveChirps(authorId) {
+    if (authorId) {
+        const result = await db.select().from(chirps).where(eq(chirps.userId, authorId)).orderBy(asc(chirps.createdAt));
+        return result;
+    }
+    else {
+        const result = await db.select().from(chirps).orderBy(asc(chirps.createdAt));
+        return result;
+    }
 }
 export async function retrieveChirp(id) {
     const [result] = await db.select().from(chirps).where(eq(chirps.id, id));

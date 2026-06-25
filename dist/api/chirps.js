@@ -44,8 +44,24 @@ export async function handlerValidation(req, res) {
     return result.join(" ");
 }
 export async function handlerChirpsRetrieval(req, res, next) {
+    let authorId = "";
+    let authorIdQuery = req.query.authorId;
+    if (typeof authorIdQuery === "string") {
+        authorId = authorIdQuery;
+    }
     try {
-        const result = await retrieveChirps();
+        const result = await retrieveChirps(authorId);
+        let sortDir = "";
+        let sortQuery = req.query.sort;
+        if (typeof sortQuery === "string") {
+            sortDir = sortQuery;
+        }
+        result.sort((a, b) => {
+            if (sortDir === "desc") {
+                return b.createdAt.getTime() - a.createdAt.getTime();
+            }
+            return a.createdAt.getTime() - b.createdAt.getTime();
+        });
         res.status(200).send(result);
     }
     catch (error) {

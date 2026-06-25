@@ -27,3 +27,11 @@ export async function updateUser(userId: string, email: string, hashedPassword: 
   .returning();
   return result;
 }
+
+export async function updateUserToChirpyRed(userId: string) {
+  const [result] = await db.update(users)
+  .set({isChirpyRed: true})
+  .where(eq(users.id, userId))
+  .returning();
+  return result;
+}

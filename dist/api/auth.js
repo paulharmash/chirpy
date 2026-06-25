@@ -50,3 +50,14 @@ export function makeRefreshToken() {
     const refreshTokenString = buf.toString('hex');
     return refreshTokenString;
 }
+export function getAPIKey(req) {
+    const fullApiKey = req.get("Authorization");
+    if (typeof fullApiKey === "string") {
+        const apiKey = fullApiKey.split(" ")[1];
+        return apiKey;
+    }
+    else {
+        throw new Unauthorized("API key must exist");
+    }
+}
+;
